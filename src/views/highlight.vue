@@ -20,7 +20,7 @@
 				</div>
 				<div class="item-icons">
 					<span @click="handleCommand('h2')">
-						<i @click="h2" class="fa fa-heading item-icon-double"></i>
+						<i class="fa fa-heading item-icon-double"></i>
 					</span>
 					<span @click="handleCommand('h3')">
 						<small><i class="fa fa-heading"></i></small>
@@ -32,13 +32,11 @@
  					</span>
 				</div>
 				<div class="item-icons">
-					<span>
-					<i @click="insertUnorderedList" class="fa fa-list-ul item-icon-double"></i>
-						
+					<span @click="handleCommand('ul')">
+						<i class="fa fa-list-ul item-icon-double"></i>
 					</span>
-					<span>
-						
-					<i class="fa fa-list-ol"></i>
+					<span @click="handleCommand('ol')">						
+						<i class="fa fa-list-ol"></i>
 					</span>
 				</div>
 				<div @click.prevent="showLink = true;" class="item-icons"><i class="fa fa-link"></i></div>
@@ -82,7 +80,11 @@ export default {
 				document.execCommand('bold', false, null);
 				break;
 				case "italic":
-				document.execCommand('italic', false, null)
+				document.execCommand('italic', false, null);
+				case "h2":
+					// console.log(document.queryCommandValue('formatBlock'));
+					document.execCommand('heading', false, "h2");
+				break;
 			}
 		},
 		selected () {
@@ -98,24 +100,8 @@ export default {
       	}
 
       	this.showMenu = false;
-    },
-    subscript()
-    {
-    	document.execCommand('subscript')
-    },
-    insertUnorderedList ()
-    {
-    	document.execCommand('insertUnorderedList')
-    },
-    h2() {
-    	document.execCommand('formatBlock', false, 'h2')
-    },
-    h3() {
-    	document.execCommand('formatBlock', false, 'h3');
-    },
-    blockQuote() {
-    	document.execCommand('formatBlock', false, 'blockquote');
     }
+   
 	}
 }
 </script>
