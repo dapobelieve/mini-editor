@@ -1,12 +1,10 @@
 <template>
 	<div class="texts">
 		<div>
-			<div class="menu z-20" v-show="showLink"  :style="{left: `${x}px`, top: `${y}px`} ">
+			<div onmousedown="event.preventDefault()" class="menu z-20" v-show="showLink"  :style="{left: `${x}px`, top: `${y}px`} ">
 				<span>
-					<input onblur="event.preventDefault()" class="link" autofocus placeholder="Enter a link" type="text">
-					<a class="close-link" 
-						@click.prevent="toggleLinkMenu" href>X</a>
-					
+					<input id="search" class="link"  placeholder="Enter a link" type="text">
+					<a class="close-link" @click.prevent="toggleLinkMenu" href>X</a>
 				</span>
 			</div>
 			<div onmousedown="event.preventDefault()" class="menu" v-show="showMenu" :style="{left: `${x}px`, top: `${y}px`}">
@@ -68,28 +66,27 @@ export default {
 				Ours was the marsh country, down by the river, within, as the river wound, twenty miles of the sea. My first most vivid and broad impression of the identity of things seems to me to have been gained on a memorable raw afternoon towards evening. At such a time I found out for certain that this bleak place overgrown with nettles was the churchyard; and that Philip Pirrip, late of this parish, and also Georgiana wife of the above, were dead and buried; and that Alexander, Bartholomew, Abraham, Tobias, and Roger, infant children of the aforesaid, were also dead and buried; and that the dark flat wilderness beyond the churchyard, intersected with dikes and mounds and gates, with scattered cattle feeding on it, was the marshes; and that the low leaden line beyond was the river; and that the distant savage lair from which the wind was rushing was the sea; and that the small bundle of shivers growing afraid of it all and beginning to cry, was Pip.`
 						}
 	},
-	computed: {
-		
-	},
 	created() {
 		document.addEventListener('selectionchange', this.selected);			
 	},
 	methods: {
-		toggleLinkMenu ()
+		toggleLinkMenu (event)
 		{
-			this.showLink = false;
+			console.log(event);
+			// this.showLink = !this.showLink;
 		},
 		handleCommand(command) {
 			switch (command) {
 				case "bold":
 				document.execCommand('bold', false, null);
+				console.log(this.selection)
 				break;
 				case "italic":
 				document.execCommand('italic', false, null);
 				case "h3":
 					document.execCommand('heading', false, "h2");
 				case "h4":
-					document.execCommand('unorderedList')
+					// document.execCommand('formatBlock', false, "")
 				break;
 				case "ul":
 					document.execCommand('insertUnorderedList', false);
@@ -104,17 +101,17 @@ export default {
 		},
 		selected () {
 			this.showLink = false;
-      this.selection = window.getSelection();
-    	const { x, y, width} = this.selection.getRangeAt(0).getBoundingClientRect();
+      		this.selection = window.getSelection();
+	    	const { x, y, width} = this.selection.getRangeAt(0).getBoundingClientRect();
 
-    	if (width > 0) {
-      	this.x = x + (width / 2);
-      	this.y = y + window.scrollY - 20;
-      	this.showMenu = true;
-      	return;
-    	}
+	    	if (width > 0) {
+	      	this.x = x + (width / 2);
+	      	this.y = y + window.scrollY - 20;
+	      	this.showMenu = true;
+	      	return;
+	    	}
 
-    	this.showMenu = false;
+	    	this.showMenu = false;
     }
    
 	}
