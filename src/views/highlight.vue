@@ -39,7 +39,11 @@
 						<i class="fa fa-list-ol"></i>
 					</span>
 				</div>
-				<div @click.prevent="showLink = true;" class="item-icons"><i class="fa fa-link"></i></div>
+				<div class="item-icons">
+					<span @click.prevent="showLink = true;">
+						<i class="fa fa-link"></i>
+					</span>
+				</div>
 			</div>
 			<div id="editor" contenteditable="true">
 				{{text}}
@@ -52,6 +56,7 @@
 export default {
 	data () {
 		return {
+			selection: {},
 			x: 0,
 			y: 0,
 			showMenu: false,
@@ -81,25 +86,35 @@ export default {
 				break;
 				case "italic":
 				document.execCommand('italic', false, null);
-				case "h2":
-					// console.log(document.queryCommandValue('formatBlock'));
+				case "h3":
 					document.execCommand('heading', false, "h2");
+				case "h4":
+					document.execCommand('unorderedList')
+				break;
+				case "ul":
+					document.execCommand('insertUnorderedList', false);
+				break;
+				case "ol":
+					document.execCommand('insertorderedlist', false);
+				break;
+				case "quote":
+					document.execCommand('formatBlock', false, 'blockquote');
 				break;
 			}
 		},
 		selected () {
 			this.showLink = false;
-      const selection = window.getSelection();
-      	const { x, y, width} = selection.getRangeAt(0).getBoundingClientRect();
+      this.selection = window.getSelection();
+    	const { x, y, width} = this.selection.getRangeAt(0).getBoundingClientRect();
 
-      	if (width > 0) {
-	      	this.x = x + (width / 2);
-	      	this.y = y + window.scrollY - 20;
-	      	this.showMenu = true;
-	      	return;
-      	}
+    	if (width > 0) {
+      	this.x = x + (width / 2);
+      	this.y = y + window.scrollY - 20;
+      	this.showMenu = true;
+      	return;
+    	}
 
-      	this.showMenu = false;
+    	this.showMenu = false;
     }
    
 	}
@@ -182,5 +197,25 @@ export default {
 .item-icon-double {
 	margin-right: 10px;
 }
+
+blockquote {
+    margin: 0;
+}
+
+blockquote p {
+    padding: 15px;
+    background: #eee;
+    border-radius: 5px;
+}
+
+blockquote p::before {
+    content: '\201C';
+}
+
+blockquote p::after {
+    content: '\201D';
+}
+
+
 
 </style>
