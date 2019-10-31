@@ -1,10 +1,18 @@
 <template>
-	<div class="texts">
-		<div>
-			<div onmousedown="event.preventDefault()" class="menu z-20" v-show="showLink"  :style="{left: `${x}px`, top: `${y}px`} ">
-				<span>
-					<input id="search" class="link"  placeholder="Enter a link" type="text">
-					<a class="close-link" @click.prevent="toggleLinkMenu" href>X</a>
+	<div  class="texts">
+		<div class="menu z-20" :style="{left: `${x}px`, top: `${y}px`} ">
+			<span>
+				<input ref="link" value="http://google.com" class="link"  placeholder="Enter a link" type="text">
+				<span class="close-link" @click.prevent="toggleLinkMenu">X</span>
+			</span>
+		</div>
+		<div onmousedown="event.preventDefault()" class="menu" v-if="showMenu" :style="{left: `${x}px`, top: `${y}px`}">
+			<div class="item-icons">
+				<span @click="handleCommand('bold')">
+					<i class="fa fa-bold item-icon-double"></i>						
+				</span>
+				<span @click="handleCommand('italic')">
+					<i class="fa fa-italic"></i>
 				</span>
 			</div>
 			<div onmousedown="event.preventDefault()" class="menu" v-show="showMenu" :style="{left: `${x}px`, top: `${y}px`}">
@@ -41,10 +49,12 @@
 					<span @click.prevent="showLink = true;">
 						<i class="fa fa-link"></i>
 					</span>
-				</div>
 			</div>
 			<div id="editor" v-html="text" contenteditable="true">
 			</div>
+		</div>
+		<div id="editor" contenteditable="true">
+			{{text}}
 		</div>
 	</div>
 </template>
@@ -75,10 +85,10 @@ export default {
 		document.addEventListener('selectionchange', this.selected);			
 	},
 	methods: {
-		toggleLinkMenu (event)
+		toggleLinkMenu ()
 		{
-			console.log(event);
-			// this.showLink = !this.showLink;
+			// console.log(event);
+			this.showLink = !this.showLink;
 		},
 		handleCommand(command) {
 			// array of tags that could surround a text block
@@ -175,7 +185,7 @@ export default {
 				break;
 			}
 		},
-		selected () {
+		selected (event) {
 			this.showLink = false;
       		this.selection = window.getSelection();
 	    	const { x, y, width} = this.selection.getRangeAt(0).getBoundingClientRect();
@@ -184,12 +194,22 @@ export default {
 	      	this.x = x + (width / 2);
 	      	this.y = y + window.scrollY - 20;
 	      	this.showMenu = true;
+	      	
 	      	return;
 	    	}
 
 	    	this.showMenu = false;
+	    	event.stopPropagation();
     }
-   
+	},
+	mounted () {
+		console.log(this.$refs)
+		this.$refs.link.focus();
+	},
+	watch: {
+		showLink(newVal, oldVal) {
+			console.log(newVal+"===="+oldVal);
+		}
 	}
 }
 </script>
@@ -243,7 +263,7 @@ export default {
 	border: 0;
 }
 .close-link {
-	text-decoration: none; 
+	cursor: pointer;
 	color: #fff; 
 	font-size: 13px; 
 	opacity: 0.45; 
