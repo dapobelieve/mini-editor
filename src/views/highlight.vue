@@ -1,12 +1,12 @@
 <template>
 	<div  class="texts">
-		<div class="menu z-20" :style="{left: `${x}px`, top: `${y}px`} ">
+		<div class="menu z-20" v-if="showLink" :style="{left: `${x}px`, top: `${y}px`} ">
 			<span>
 				<input ref="link" value="http://google.com" class="link"  placeholder="Enter a link" type="text">
 				<span class="close-link" @click.prevent="toggleLinkMenu">X</span>
 			</span>
 		</div>
-		<div onmousedown="event.preventDefault()" class="menu" v-if="showMenu" :style="{left: `${x}px`, top: `${y}px`}">
+		<div onmousedown="event.preventDefault()" class="menu" v-show="showMenu" :style="{left: `${x}px`, top: `${y}px`}">
 			<div class="item-icons">
 				<span @click="handleCommand('bold')">
 					<i class="fa fa-bold item-icon-double"></i>						
@@ -15,46 +15,34 @@
 					<i class="fa fa-italic"></i>
 				</span>
 			</div>
-			<div onmousedown="event.preventDefault()" class="menu" v-show="showMenu" :style="{left: `${x}px`, top: `${y}px`}">
-				<div class="item-icons">
-					<span @click="handleCommand('bold')">
-						<i class="fa fa-bold item-icon-double"></i>						
-					</span>
-					<span @click="handleCommand('italic')">
-						<i class="fa fa-italic"></i>
-					</span>
-				</div>
-				<div class="item-icons">
-					<span @click="handleCommand('h3')">
-						<i class="fa fa-heading item-icon-double"></i>
-					</span>
-					<span @click="handleCommand('h4')">
-						<small><i class="fa fa-heading"></i></small>
-					</span>
-				</div>
-				<div class="item-icons">
-					<span @click="handleCommand('quote')">
-						<i class="fa fa-quote-right"></i>
- 					</span>
-				</div>
-				<div class="item-icons">
-					<span @click="handleCommand('ul')">
-						<i class="fa fa-list-ul item-icon-double"></i>
-					</span>
-					<span @click="handleCommand('ol')">						
-						<i class="fa fa-list-ol"></i>
-					</span>
-				</div>
-				<div class="item-icons">
-					<span @click.prevent="showLink = true;">
-						<i class="fa fa-link"></i>
+			<div class="item-icons">
+				<span @click="handleCommand('h3')">
+					<i class="fa fa-heading item-icon-double"></i>
+				</span>
+				<span @click="handleCommand('h4')">
+					<small><i class="fa fa-heading"></i></small>
+				</span>
+			</div>
+			<div class="item-icons">
+				<span @click="handleCommand('quote')">
+					<i class="fa fa-quote-right"></i>
 					</span>
 			</div>
-			<div id="editor" v-html="text" contenteditable="true">
+			<div class="item-icons">
+				<span @click="handleCommand('ul')">
+					<i class="fa fa-list-ul item-icon-double"></i>
+				</span>
+				<span @click="handleCommand('ol')">						
+					<i class="fa fa-list-ol"></i>
+				</span>
+			</div>
+			<div class="item-icons">
+				<span @click.prevent="showLink = true;">
+					<i class="fa fa-link"></i>
+				</span>
 			</div>
 		</div>
-		<div id="editor" contenteditable="true">
-			{{text}}
+		<div id="editor" v-html="text" contenteditable="true">
 		</div>
 	</div>
 </template>
@@ -91,20 +79,8 @@ export default {
 			this.showLink = !this.showLink;
 		},
 		handleCommand(command) {
-			// array of tags that could surround a text block
-			let blockTags = ['h3', 'p', 'h4', 'blockquote'];
 
-			let sel = document.getSelection();
-
-			let selectRange = sel.getRangeAt(0);
-			let currentParent = selectRange.commonAncestorContainer.parentNode;
-			let content = selectRange.commonAncestorContainer.data.toString();
-			let currentTagName = currentParent.nodeName.toLowerCase();
-			let parent, tagName, newTag;
-
-			console.log(currentTagName);
-			console.log('content::before')
-			console.log(content)
+			let currentTagName = document.getSelection().getRangeAt(0).commonAncestorContainer.parentNode.nodeName.toLowerCase();
 
 			switch (command) {
 				case "bold":
@@ -115,44 +91,13 @@ export default {
 				break;
 				case "h3":
 					
-					parent = blockTags.includes(currentTagName, 0) == true ? currentParent : currentParent.parentNode;
-
-					if (!blockTags.includes(currentTagName))
-						content = selectRange.commonAncestorContainer.parentElement.parentElement.innerHTML;
-					
-					
-					currentTagName = parent.nodeName.toLowerCase();
-
-					console.log('content::after')
-					console.log(content)
-					
-					tagName = currentTagName !== 'h3' ? 'h3' : 'p';
-
-					newTag = document.createElement(tagName);
-					newTag.innerHTML = content;
-
-					parent.parentNode.replaceChild(newTag, parent);
+					currentTagName !== 'h3' ? document.execCommand('formatBlock', false, 'h3') : document.execCommand('formatBlock', false, 'p');
 
 					this.showMenu = false;
 				break;
 				case "h4":
-
-					parent = blockTags.includes(currentTagName, 0) == true ? currentParent : currentParent.parentNode;
-
-					if (!blockTags.includes(currentTagName))
-						content = selectRange.commonAncestorContainer.parentElement.parentElement.innerHTML;
 					
-					
-					currentTagName = parent.nodeName.toLowerCase();
-
-					console.log(content)
-					
-					tagName = currentTagName !== 'h4' ? 'h4' : 'p';
-
-					newTag = document.createElement(tagName);
-					newTag.innerHTML = content;
-
-					parent.parentNode.replaceChild(newTag, parent);
+					currentTagName !== 'h4' ? document.execCommand('formatBlock', false, 'h4') : document.execCommand('formatBlock', false, 'p');
 
 					this.showMenu = false;
 				break;
@@ -160,26 +105,10 @@ export default {
 					document.execCommand('insertUnorderedList', false);
 				break;
 				case "ol":
-					document.execCommand('insertorderedlist', false);
+					document.execCommand('insertOrderedList', false);
 				break;
 				case "quote":
-					parent = blockTags.includes(currentTagName, 0) == true ? currentParent : currentParent.parentNode;
-
-					if (!blockTags.includes(currentTagName))
-						content = selectRange.commonAncestorContainer.parentElement.parentElement.innerHTML;
-					
-					
-					currentTagName = parent.nodeName.toLowerCase();
-
-					console.log('content::after')
-					console.log(content)
-					
-					tagName = currentTagName !== 'blockquote' ? 'blockquote' : 'p';
-
-					newTag = document.createElement(tagName);
-					newTag.innerHTML = content;
-
-					parent.parentNode.replaceChild(newTag, parent);
+					currentTagName !== 'blockquote' ? document.execCommand('formatBlock', false, 'blockquote') : document.execCommand('formatBlock', false, 'p');
 
 					this.showMenu = false;
 				break;
@@ -200,10 +129,10 @@ export default {
 
 	    	this.showMenu = false;
 	    	event.stopPropagation();
-    }
+    	}
 	},
 	mounted () {
-		console.log(this.$refs)
+		// console.log(this.$refs)
 		this.$refs.link.focus();
 	},
 	watch: {
